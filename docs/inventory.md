@@ -3,40 +3,50 @@ title: Inventory Example
 ---
 ::: mermaid
 classDiagram
-    Resource --|> Item
-    Node --|> InventorySlot
-    Node --|> Inventory
-    class Item {
-        +String     display_name
-        +Texture2D  icon
-        +Int        max_stack_size
-        +on_use(player)
+    Resource --|> Slottable
+    class Slottable {
+
     }
 
-    class InventorySlot {
-        Item item
-        int quantity
-        TextureRect icon
-        Label quantity_text
-        Inventory inventory
-        set_item(Item item)
-        add_item()
-        remove_item
-        update_quantity_text()
+    Slottable --|> Item
+    class Item {
+        +int id
+        +String display_name
+        +String description
+        +Texture2D icon
     }
+
+    Slottable --|> Spell
+    class Spell {
+        +int id
+    }
+
+    Object --|> Container
+    class Container {
+        -Slot[] _slots
+        add_item(Item)
+        remove_item(Item)
+    }
+    
+    Container --|> Bag
+    class Bag {
+        Item[] items
+        sort()
+        split_item(Item)
+    }
+
+    Object --|> Slot
+    class Slot {
+        Slottable slottable
+    }
+
+    Container --|> Inventory
     class Inventory {
-        Array~InventorySlot~ slots
-        Panel window
-        Label info_text
-        Array~Item~ starter_items
-        ready()
-        _process()
-        toggle_window(bool open)
-        on_give_player_item(Item item, int amount)
-        add_item(Item item)
-        remove_item(Item item)
-        get_slot_to_add(Item item) InventorySlot
-        get_slot_to_remove(Item item) InventorySlot
-        get_number_of_item(Item item) int
+        Bag[] bags
+    }
+
+    Container --|> SpellBook
+    class SpellBook {
+        Spell[] spells
     }
 ::: 

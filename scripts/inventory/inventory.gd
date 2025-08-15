@@ -1,34 +1,29 @@
 class_name Inventory
 extends Node
 
-
 var slots : Array[InventorySlot]
-# @onready var window : Panel = get_node("Inventory")
-# @onready var info_text : Label = get_node("Inventory/InfoText")
 @export var starter_items : Array[Item]
 
 func _ready():
-	toggle_window(false)
+	GlobalInventory.ready.connect(_on_global_inventory_ready)
+	if GlobalInventory.is_node_ready(): _on_global_inventory_ready()
+	self.visible = false
+
+
 	for child in get_node("GridContainer").get_children():
 		slots.append(child)
 		child.set_item(null)
 		child.inventory = self
 	
-	GlobalSignals.on_give_player_item.connect(on_give_player_item)
-
 	for item in starter_items:
-		print('Adding starter item: ' + item.display_name)
 		add_item(item)
+
+func _on_global_inventory_ready():
+	print(GlobalInventory.item.name)
 
 func _process(_delta):
 	if Input.is_action_just_pressed("inventory"):
-		toggle_window(!self.visible)
-
-func toggle_window (open : bool):
-	self.visible = open
-
-func on_give_player_item(item : Item, amount : int):
-	pass
+		self.visible = !self.visible
 
 func add_item(item : Item):
 	var slot = get_slot_to_add(item)

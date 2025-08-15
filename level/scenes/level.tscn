@@ -1,13 +1,12 @@
-[gd_scene load_steps=22 format=3 uid="uid://dugaivbj1o66n"]
+[gd_scene load_steps=21 format=3 uid="uid://dugaivbj1o66n"]
 
 [ext_resource type="Script" uid="uid://d0dgljwwl463n" path="res://level/scripts/level.gd" id="1_e1sh7"]
 [ext_resource type="PackedScene" uid="uid://cffjduipbb3s5" path="res://level/scenes/player.tscn" id="1_uvcbi"]
 [ext_resource type="FontFile" uid="uid://diapabmalpcrj" path="res://assets/fonts/Kurland.ttf" id="3_icc4p"]
 [ext_resource type="Script" uid="uid://bgprcq73gickx" path="res://scripts/inventory/inventory.gd" id="4_cwx4m"]
-[ext_resource type="Texture2D" uid="uid://dh1ifirvusxky" path="res://assets/icons/Action_Inventory.png" id="4_u750a"]
 [ext_resource type="Script" uid="uid://cp2m3ox0smm0g" path="res://scripts/inventory/item.gd" id="5_mrm38"]
-[ext_resource type="Script" uid="uid://da2op73owjcy7" path="res://scripts/inventory/inventory_slot.gd" id="5_xerh7"]
 [ext_resource type="Resource" uid="uid://cig0prtbjfrwk" path="res://items/health_potion.tres" id="6_tyhqh"]
+[ext_resource type="Texture2D" uid="uid://b0nfg6rtan6u" path="res://prefabs/backpack.tres" id="7_i7s07"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_r5xs5"]
 size = Vector2(90, 90)
@@ -377,22 +376,21 @@ grow_horizontal = 2
 grow_vertical = 2
 columns = 4
 
-[node name="InventorySlot" type="Button" parent="Inventory/GridContainer"]
+[node name="Button" type="Button" parent="Inventory/GridContainer"]
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
-script = ExtResource("5_xerh7")
 
-[node name="TextureRect" type="TextureRect" parent="Inventory/GridContainer/InventorySlot"]
+[node name="TextureRect" type="TextureRect" parent="Inventory/GridContainer/Button"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("4_u750a")
+texture = ExtResource("7_i7s07")
 expand_mode = 1
 
-[node name="Label" type="Label" parent="Inventory/GridContainer/InventorySlot"]
+[node name="Label" type="Label" parent="Inventory/GridContainer/Button"]
 layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0

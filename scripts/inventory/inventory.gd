@@ -1,64 +1,24 @@
-class_name Inventory
-extends Node
+class_name InventoryGUI
+extends Control
 
-var slots : Array[InventorySlot]
-@export var starter_items : Array[Item]
+@onready var inventory_bag_gui: PackedScene = preload("res://prefabs/inventory_bag_gui.tscn")
+@onready var inventory_bag_slot_gui: PackedScene = preload("res://prefabs/inventory_bag_slot_gui.tscn")
+@onready var inventory_bag_container: VBoxContainer = $VBoxContainer
 
-func _ready():
-	GlobalInventory.ready.connect(_on_global_inventory_ready)
-	if GlobalInventory.is_node_ready(): _on_global_inventory_ready()
+func _ready() -> void:
+	GlobalInventory.bags_updated.connect(_on_bags_updated)
+	if GlobalInventory.bags.size(): _on_bags_updated()
 	self.visible = false
 
-
-	for child in get_node("GridContainer").get_children():
-		slots.append(child)
-		child.set_item(null)
-		child.inventory = self
-	
-	for item in starter_items:
-		add_item(item)
-
-func _on_global_inventory_ready():
-	print(GlobalInventory.item.name)
-
-func _process(_delta):
+func _process(_delta: float) -> void:
 	if Input.is_action_just_pressed("inventory"):
-		self.visible = !self.visible
+		self.visible = not self.visible
 
-func add_item(item : Item):
-	var slot = get_slot_to_add(item)
-	if slot == null:
-		return
-	if slot.item == null:
-		slot.set_item(item)
-	elif slot.item == item:
-		slot.add_item()
 
-func remove_item(item : Item):
-	var slot = get_slot_to_remove(item)
-	if slot == null or slot.item != item:
-		return
-	slot.remove_item()
-
-func get_slot_to_add(item : Item) -> InventorySlot:
-	for slot in slots:
-		if slot.item == item and slot.quantity < item.max_stack_size:
-			return slot
-
-	for slot in slots:
-		if slot.item == null:
-			return slot
-	return null
-
-func get_slot_to_remove(item : Item) -> InventorySlot:
-	for slot in slots:
-		if slot.item == item:
-			return slot
-	return null
-
-func get_number_of_item(item : Item) -> int:
-	var total = 0
-	for slot in slots:
-		if slot.item == item:
-			total += slot.quantity
-	return total
+func _on_bags_updated() -> void:
+	var new_bag := inventory_bag_gui.instantiate()
+	inventory_bag_container.add_child(new_bag)
+	for bag in GlobalInventory.bags:
+		for n in bag.container_slots:
+			var new_slot := inventory_bag_slot_gui.instantiate()
+			new_bag.add_child(new_slot)

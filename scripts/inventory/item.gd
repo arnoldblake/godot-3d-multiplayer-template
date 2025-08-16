@@ -8,6 +8,6 @@ extends Resource
 @export var max_stack_size: int
 
 
-func _on_use(_player) -> bool:
+func _on_use(_player: Character) -> bool:
     print("Use")
     return false

@@ -1,6 +1,8 @@
 ---
-title: Inventory Example
+title: Inventory Systems
 ---
+
+
 
 ::: mermaid
 ---
@@ -10,6 +12,12 @@ config:
 ---
 
 classDiagram
+    Node --|> GlobalInventory
+    class GlobalInventory {
+        -Item[] items
+        _ready() void
+    }
+
     Resource --|> Item_Template
     class Item_Template {
         int entry
@@ -21,4 +29,6 @@ classDiagram
         int container_slots
         String description
     }
+
+
 ::: 

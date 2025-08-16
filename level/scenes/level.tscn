@@ -1,12 +1,9 @@
-[gd_scene load_steps=21 format=3 uid="uid://dugaivbj1o66n"]
+[gd_scene load_steps=18 format=3 uid="uid://dugaivbj1o66n"]
 
 [ext_resource type="Script" uid="uid://d0dgljwwl463n" path="res://level/scripts/level.gd" id="1_e1sh7"]
 [ext_resource type="PackedScene" uid="uid://cffjduipbb3s5" path="res://level/scenes/player.tscn" id="1_uvcbi"]
 [ext_resource type="FontFile" uid="uid://diapabmalpcrj" path="res://assets/fonts/Kurland.ttf" id="3_icc4p"]
 [ext_resource type="Script" uid="uid://bgprcq73gickx" path="res://scripts/inventory/inventory.gd" id="4_cwx4m"]
-[ext_resource type="Script" uid="uid://cp2m3ox0smm0g" path="res://scripts/inventory/item.gd" id="5_mrm38"]
-[ext_resource type="Resource" uid="uid://cig0prtbjfrwk" path="res://items/health_potion.tres" id="6_tyhqh"]
-[ext_resource type="Texture2D" uid="uid://b0nfg6rtan6u" path="res://prefabs/backpack.tres" id="7_i7s07"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_r5xs5"]
 size = Vector2(90, 90)
@@ -347,58 +344,29 @@ anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="Inventory" type="Control" parent="."]
+[node name="InventoryGUI" type="Control" parent="."]
+physics_interpolation_mode = 0
 layout_mode = 3
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-grow_horizontal = 2
-grow_vertical = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-script = ExtResource("4_cwx4m")
-starter_items = Array[ExtResource("5_mrm38")]([ExtResource("6_tyhqh")])
-
-[node name="GridContainer" type="GridContainer" parent="Inventory"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -32.0
-offset_top = -32.0
-offset_right = 32.0
-offset_bottom = 32.0
-grow_horizontal = 2
-grow_vertical = 2
-columns = 4
-
-[node name="Button" type="Button" parent="Inventory/GridContainer"]
-custom_minimum_size = Vector2(64, 64)
-layout_mode = 2
-
-[node name="TextureRect" type="TextureRect" parent="Inventory/GridContainer/Button"]
-layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("7_i7s07")
-expand_mode = 1
+script = ExtResource("4_cwx4m")
+metadata/_custom_type_script = "uid://bgprcq73gickx"
 
-[node name="Label" type="Label" parent="Inventory/GridContainer/Button"]
+[node name="VBoxContainer" type="VBoxContainer" parent="InventoryGUI"]
+layout_direction = 2
 layout_mode = 1
-anchors_preset = 2
+anchors_preset = 3
+anchor_left = 1.0
 anchor_top = 1.0
+anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -23.0
-offset_right = 40.0
+offset_left = -200.0
+offset_top = -200.0
+grow_horizontal = 0
 grow_vertical = 0
-text = "100"
 
 [connection signal="pressed" from="Menu/MainContainer/MainMenu/Buttons/Host" to="." method="_on_host_pressed"]
 [connection signal="pressed" from="Menu/MainContainer/MainMenu/Buttons/Join" to="." method="_on_join_pressed"]

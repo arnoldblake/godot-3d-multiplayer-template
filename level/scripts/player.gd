@@ -23,23 +23,22 @@ enum SkinColor { BLUE, YELLOW, GREEN, RED }
 @onready var _chest_mesh: MeshInstance3D = get_node("3DGodotRobot/RobotArmature/Skeleton3D/Chest")
 @onready var _face_mesh: MeshInstance3D = get_node("3DGodotRobot/RobotArmature/Skeleton3D/Face")
 @onready var _limbs_head_mesh: MeshInstance3D = get_node("3DGodotRobot/RobotArmature/Skeleton3D/Llimbs and head")
-@onready var _camera: Camera3D = get_node("SpringArmOffset/SpringArm3D/Camera3D")
 
 var _current_speed: float
-var _respawn_point = Vector3(0, 5, 0)
-var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
+var _respawn_point: Vector3 = Vector3(0, 5, 0)
+var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 
-func _enter_tree():
+func _enter_tree() -> void:
 	set_multiplayer_authority(str(name).to_int())
 	$SpringArmOffset/SpringArm3D/Camera3D.current = is_multiplayer_authority()
-	
-func _ready():
+
+func _ready() -> void:
 	return
 	
-func _physics_process(delta):
+func _physics_process(delta: float) -> void:
 	if not is_multiplayer_authority(): return
 	
-	var current_scene = get_tree().get_current_scene()
+	var current_scene := get_tree().get_current_scene()
 	if current_scene and current_scene.has_method("is_chat_visible") and current_scene.is_chat_visible() and is_on_floor():
 		freeze()
 		return
@@ -57,12 +56,12 @@ func _physics_process(delta):
 	_move()
 	move_and_slide()
 	_body.animate(velocity)
-	
-func _process(_delta):
+
+func _process(_delta: float) -> void:
 	if not is_multiplayer_authority(): return
 	_check_fall_and_respawn()
-	
-func freeze():
+
+func freeze() -> void:
 	velocity.x = 0
 	velocity.z = 0
 	_current_speed = 0
@@ -97,17 +96,17 @@ func is_running() -> bool:
 	else:
 		_current_speed = NORMAL_SPEED
 		return false
-		
-func _check_fall_and_respawn():
+
+func _check_fall_and_respawn() -> void:
 	if global_transform.origin.y < -15.0:
 		_respawn()
-		
-func _respawn():
+
+func _respawn() -> void:
 	global_transform.origin = _respawn_point
 	velocity = Vector3.ZERO
 	
 @rpc("any_peer", "reliable")
-func change_nick(new_nick: String):
+func change_nick(new_nick: String) -> void:
 	if nickname:
 		nickname.text = new_nick
 		
@@ -121,8 +120,8 @@ func get_texture_from_name(skin_color: SkinColor) -> CompressedTexture2D:
 		
 @rpc("any_peer", "reliable")
 func set_player_skin(skin_name: SkinColor) -> void:
-	var texture = get_texture_from_name(skin_name)
-	
+	var texture : CompressedTexture2D = get_texture_from_name(skin_name)
+
 	set_mesh_texture(_bottom_mesh, texture)
 	set_mesh_texture(_chest_mesh, texture)
 	set_mesh_texture(_face_mesh, texture)

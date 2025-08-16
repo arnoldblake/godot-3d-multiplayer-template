@@ -21,6 +21,11 @@ config/icon="res://icon.png"
 
 Network="*res://level/scripts/network.gd"
 GlobalSignals="*res://scripts/global_signals.gd"
+GlobalInventory="*res://scripts/global_inventory.gd"
+
+[debug]
+
+gdscript/warnings/untyped_declaration=2
 
 [display]
 

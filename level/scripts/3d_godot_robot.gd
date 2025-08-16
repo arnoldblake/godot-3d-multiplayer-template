@@ -8,7 +8,7 @@ const LERP_VELOCITY: float = 0.15
 @export var animation_player: AnimationPlayer = null
 
 func apply_rotation(_velocity: Vector3) -> void:
-	var new_rotation_y = lerp_angle(rotation.y, atan2(-_velocity.x, -_velocity.z), LERP_VELOCITY)
+	var new_rotation_y := lerp_angle(rotation.y, atan2(-_velocity.x, -_velocity.z), LERP_VELOCITY)
 	rotation.y = new_rotation_y
 	
 	rpc("sync_player_rotation", new_rotation_y)

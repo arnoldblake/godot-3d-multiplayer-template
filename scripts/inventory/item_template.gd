@@ -7,6 +7,11 @@ enum ITEM_CLASS {
 }
 
 enum ITEM_SUBCLASS {
+	CONSUMEABLE,
+	POTION,
+	ELIXIR,
+	FLASK,
+	SCROLL,
 	BAG
 }
 
@@ -19,7 +24,7 @@ var stackable: bool 			# Whether the item can be stacked
 var container_slots: int 		# Number of slots the item occupies in a container
 var description: String 		# Description of the item
 
-func _init(e, _c, _sc, n, d_id, s, c, d):
+func _init(e: int, _c: ITEM_CLASS, _sc: ITEM_SUBCLASS, n: String, d_id: Texture2D, s: bool, c: int, d: String) -> void:
 	entry = e
 	_class = _c
 	_subclass = _sc

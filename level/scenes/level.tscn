@@ -352,6 +352,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 script = ExtResource("4_cwx4m")
 metadata/_custom_type_script = "uid://bgprcq73gickx"
 
@@ -363,8 +364,10 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -200.0
-offset_top = -200.0
+offset_left = -264.0
+offset_top = -264.0
+offset_right = -64.0
+offset_bottom = -64.0
 grow_horizontal = 0
 grow_vertical = 0
 

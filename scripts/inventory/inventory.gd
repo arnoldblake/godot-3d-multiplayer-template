@@ -7,7 +7,7 @@ extends Control
 
 func _ready() -> void:
 	GlobalInventory.bags_updated.connect(_on_bags_updated)
-	if GlobalInventory.is_node_ready(): _on_bags_updated()
+	if GlobalInventory.is_node_ready(): _on_bags_updated(0)
 	GlobalInventory.items_updated.connect(_on_items_updated)
 	if GlobalInventory.is_node_ready(): _on_items_updated()
 	
@@ -18,13 +18,14 @@ func _process(_delta: float) -> void:
 		self.visible = not self.visible
 
 
-func _on_bags_updated() -> void:
+func _on_bags_updated(_index: int) -> void:
 	for bag_containers: Node in $VBoxContainer.get_children():
 		bag_containers.queue_free()
 
-	for bag_slot in GlobalInventory.bags:
-		if bag_slot == null:
+	for bag_slot in GlobalInventory.bag_slots:
+		if bag_slot == null || bag_slot.item == null:
 			return
+		
 		var new_bag := inventory_bag_gui.instantiate()
 		inventory_bag_container.add_child(new_bag)
 		for n: int in bag_slot.item.container_slots:

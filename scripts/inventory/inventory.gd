@@ -8,8 +8,8 @@ extends Control
 func _ready() -> void:
 	GlobalInventory.bags_updated.connect(_on_bags_updated)
 	if GlobalInventory.is_node_ready(): _on_bags_updated(GlobalInventory.bag_slots)
-	# GlobalInventory.items_updated.connect(_on_items_updated)
-	# if GlobalInventory.is_node_ready(): _on_items_updated()
+	GlobalInventory.items_updated.connect(_on_items_updated)
+	if GlobalInventory.is_node_ready(): _on_items_updated()
 	
 	self.visible = false
 
@@ -24,8 +24,7 @@ func _on_bags_updated(_bag_slots: Array[Inventory_Slot]) -> void:
 
 	for bag_slot in GlobalInventory.bag_slots:
 		if bag_slot == null || bag_slot.item == null:
-			return
-		
+			break
 		var new_bag := inventory_bag_gui.instantiate()
 		inventory_bag_container.add_child(new_bag)
 		for n: int in bag_slot.item.container_slots:
@@ -37,8 +36,9 @@ func _on_items_updated() -> void:
 	if grid_containers.size() == 0:
 		return
 
-	# for n in GlobalInventory.items.size():
-	# 	var item := GlobalInventory.items[n]
-	# 	var texture_rect: TextureRect = grid_containers[0].get_node("Button").get_node("TextureRect")
-	# 	if texture_rect:
-	# 		texture_rect.texture = item.display_id
+	for item_slot in GlobalInventory.item_slots:
+		if item_slot == null or item_slot.item == null:
+			break
+		var texture_rect: TextureRect = grid_containers[0].get_node("Button").get_node("TextureRect")
+		if texture_rect:
+			texture_rect.texture = item_slot.item.display_id

@@ -1,6 +1,6 @@
 extends Node
 
-signal bags_updated(index: int)
+signal bags_updated(bag_slots: Array[Inventory_Slot])
 signal items_updated
 
 var bag_slots: Array[Inventory_Slot]: 
@@ -11,11 +11,10 @@ var bag_slots: Array[Inventory_Slot]:
 			return
 		bag_slots = value
 
-var items: Array[Item_Template]:
-	get: return items
+var item_slots: Array[Inventory_Slot]:
+	get: return item_slots
 	set(value):
-		items = value
-		items_updated.emit()
+		item_slots = value
 
 func _ready() -> void:
 
@@ -27,7 +26,7 @@ func _ready() -> void:
 			Item_Template.ITEM_CLASS.CONTAINER,
 			Item_Template.ITEM_SUBCLASS.BAG
 		)
-		bag_slot.slot_changed.connect(_on_slot_changed)
+		bag_slot.slot_changed.connect(_on_bag_slot_changed)
 		bag_slots.append(bag_slot)
 
 	var new_bag: Item_Template = Item_Template.new(
@@ -40,13 +39,21 @@ func _ready() -> void:
 		8,
 		"A sturdy backpack for carrying items."
 	)
-	for n in bag_slots:
-		if n.item == null:
-			n.item = new_bag
+	for bag_slot in bag_slots:
+		if bag_slot.item == null:
+			bag_slot.item = new_bag
+			print(new_bag.container_slots)
+			for container_slots in new_bag.container_slots:
+				print(Item_Template.ITEM_CLASS.CONSUMABLE | Item_Template.ITEM_CLASS.CONTAINER)
+				var new_slot: Inventory_Slot = Inventory_Slot.new(
+					Item_Template.ITEM_CLASS.CONSUMABLE & Item_Template.ITEM_CLASS.CONTAINER,
+					Item_Template.ITEM_SUBCLASS.CONSUMEABLE & Item_Template.ITEM_SUBCLASS.POTION & Item_Template.ITEM_SUBCLASS.ELIXIR & Item_Template.ITEM_SUBCLASS.FLASK & Item_Template.ITEM_SUBCLASS.SCROLL & Item_Template.ITEM_SUBCLASS.BAG
+				)
+				new_slot.slot_changed.connect(_on_inventory_slot_changed)
+				item_slots.append(new_slot)
 			break
 
-	var new_items: Array[Item_Template] = items.duplicate()
-	new_items.append(Item_Template.new(
+	var new_item: Item_Template = Item_Template.new(
 		1,
 		Item_Template.ITEM_CLASS.CONSUMABLE,
 		Item_Template.ITEM_SUBCLASS.POTION,
@@ -55,9 +62,15 @@ func _ready() -> void:
 		false,
 		1,
 		"A potion that restores health."
-	))
-	items = new_items
+	)
+	for item_slot in item_slots:
+		if item_slot.item == null:
+			item_slot.item = new_item
+			break
 
-func _on_slot_changed(slot: Inventory_Slot) -> void:
-	var index: int = bag_slots.find(slot)
-	bags_updated.emit(index)
+func _on_bag_slot_changed(_slot: Inventory_Slot) -> void:
+	bags_updated.emit(bag_slots)
+
+func _on_inventory_slot_changed(_slot: Inventory_Slot) -> void:
+	print(_slot)
+	pass

@@ -7,9 +7,9 @@ extends Control
 
 func _ready() -> void:
 	GlobalInventory.bags_updated.connect(_on_bags_updated)
-	if GlobalInventory.is_node_ready(): _on_bags_updated(0)
-	GlobalInventory.items_updated.connect(_on_items_updated)
-	if GlobalInventory.is_node_ready(): _on_items_updated()
+	if GlobalInventory.is_node_ready(): _on_bags_updated(GlobalInventory.bag_slots)
+	# GlobalInventory.items_updated.connect(_on_items_updated)
+	# if GlobalInventory.is_node_ready(): _on_items_updated()
 	
 	self.visible = false
 
@@ -18,7 +18,7 @@ func _process(_delta: float) -> void:
 		self.visible = not self.visible
 
 
-func _on_bags_updated(_index: int) -> void:
+func _on_bags_updated(_bag_slots: Array[Inventory_Slot]) -> void:
 	for bag_containers: Node in $VBoxContainer.get_children():
 		bag_containers.queue_free()
 
@@ -37,8 +37,8 @@ func _on_items_updated() -> void:
 	if grid_containers.size() == 0:
 		return
 
-	for n in GlobalInventory.items.size():
-		var item := GlobalInventory.items[n]
-		var texture_rect: TextureRect = grid_containers[0].get_node("Button").get_node("TextureRect")
-		if texture_rect:
-			texture_rect.texture = item.display_id
+	# for n in GlobalInventory.items.size():
+	# 	var item := GlobalInventory.items[n]
+	# 	var texture_rect: TextureRect = grid_containers[0].get_node("Button").get_node("TextureRect")
+	# 	if texture_rect:
+	# 		texture_rect.texture = item.display_id

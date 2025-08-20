@@ -1,6 +1,6 @@
 extends Node
 
-signal bags_updated(bag_slots: Array[Inventory_Slot])
+signal bags_updated()
 signal items_updated
 
 var bag_slots: Array[Inventory_Slot]: 
@@ -45,7 +45,7 @@ func _ready() -> void:
 			for container_slots in new_bag.container_slots:
 				var new_slot: Inventory_Slot = Inventory_Slot.new(
 					Item_Template.ITEM_CLASS.CONSUMABLE | Item_Template.ITEM_CLASS.CONTAINER,
-					Item_Template.ITEM_SUBCLASS.CONSUMEABLE | Item_Template.ITEM_SUBCLASS.POTION | Item_Template.ITEM_SUBCLASS.ELIXIR | Item_Template.ITEM_SUBCLASS.FLASK | Item_Template.ITEM_SUBCLASS.SCROLL | Item_Template.ITEM_SUBCLASS.BAG
+					Item_Template.ITEM_SUBCLASS.CONSUMABLE | Item_Template.ITEM_SUBCLASS.POTION | Item_Template.ITEM_SUBCLASS.ELIXIR | Item_Template.ITEM_SUBCLASS.FLASK | Item_Template.ITEM_SUBCLASS.SCROLL | Item_Template.ITEM_SUBCLASS.BAG
 				)
 				new_slot.slot_changed.connect(_on_inventory_slot_changed)
 				item_slots.append(new_slot)
@@ -67,7 +67,7 @@ func _ready() -> void:
 			break
 
 func _on_bag_slot_changed(_slot: Inventory_Slot) -> void:
-	bags_updated.emit(bag_slots)
+	bags_updated.emit()
 
 func _on_inventory_slot_changed(_slot: Inventory_Slot) -> void:
 	items_updated.emit()

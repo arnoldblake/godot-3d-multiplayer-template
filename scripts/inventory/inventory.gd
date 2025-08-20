@@ -7,7 +7,7 @@ extends Control
 
 func _ready() -> void:
 	GlobalInventory.bags_updated.connect(_on_bags_updated)
-	if GlobalInventory.is_node_ready(): _on_bags_updated(GlobalInventory.bag_slots)
+	if GlobalInventory.is_node_ready(): _on_bags_updated()
 	GlobalInventory.items_updated.connect(_on_items_updated)
 	if GlobalInventory.is_node_ready(): _on_items_updated()
 	
@@ -18,7 +18,7 @@ func _process(_delta: float) -> void:
 		self.visible = not self.visible
 
 
-func _on_bags_updated(_bag_slots: Array[Inventory_Slot]) -> void:
+func _on_bags_updated() -> void:
 	for bag_containers: Node in $VBoxContainer.get_children():
 		bag_containers.queue_free()
 

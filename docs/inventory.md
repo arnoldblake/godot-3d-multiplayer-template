@@ -10,7 +10,7 @@ The inventory system is designed around a flexible slot-based architecture that 
 
 ### GlobalInventory (Singleton)
 - Manages the player's inventory state globally
-- Maintains arrays of inventory slots for bags and items
+- Maintains arrays of inventory slots for bag containers (`bag_slots`) and items within bags (`item_slots`)
 - Emits signals when bags or items are updated
 - Handles initial setup with default backpack and health potion
 
@@ -22,29 +22,38 @@ The inventory system is designed around a flexible slot-based architecture that 
 
 ### Inventory_Slot (Node)
 - Container that can hold a specific type of Item_Template
-- Validates items based on class and subclass restrictions
+- Validates items based on class and subclass restrictions (`slot_class` and `slot_subclass`)
 - Used for both bag slots and item slots within bags
+- Emits `slot_changed` signal when item is assigned or removed
 
 ### InventoryGUI (Control)
 - Main UI component for displaying the inventory
 - Dynamically creates bag and slot UI elements
 - Responds to GlobalInventory signals to update display
+- Handles inventory visibility toggle with input action
+
+### Item (Resource) - Alternative Implementation
+- Alternative item class with simplified structure
+- Contains `display_name`, `description`, `icon`, and `max_stack_size` properties
+- Includes `_on_use()` method for item usage logic
+- Currently exists alongside Item_Template but not actively used in main inventory system
 
 ## System Flow
 
-1. **Initialization**: **GlobalInventory** creates an array of **Inventory_Slots** to hold bags
+1. **Initialization**: **GlobalInventory** creates an array of **bag_slots** to hold bag containers and initializes empty **item_slots** array
 2. **Bag Assignment**: Each bag slot is assigned a bag (Item_Template with CONTAINER class)
-3. **GUI Creation**: When bags are updated, **InventoryGUI** creates visual representations using prefab scenes
-4. **Slot Generation**: For each bag, the system creates GUI slots based on the bag's `container_slots` property
-5. **Item Assignment**: Items (like health potions) are assigned to slots within bags
-6. **Visual Update**: The GUI updates TextureRect components to show item icons in appropriate slots
+3. **Item Slot Creation**: When a bag is assigned, the system creates item slots based on the bag's `container_slots` property
+4. **GUI Creation**: When bags are updated, **InventoryGUI** creates visual representations using prefab scenes
+5. **Slot Generation**: For each bag, the GUI creates visual slot elements dynamically
+6. **Item Assignment**: Items (like health potions) are assigned to slots within bags
+7. **Visual Update**: The GUI updates TextureRect components to show item icons in appropriate slots
 
 ### Signal Flow
 - `GlobalInventory.bags_updated` → `InventoryGUI._on_bags_updated()` → Creates bag GUI elements
 - `GlobalInventory.items_updated` → `InventoryGUI._on_items_updated()` → Updates item icons in slots
 
 ### Validation
-- **Inventory_Slot** validates items based on `item_class` and `item_subclass` restrictions
+- **Inventory_Slot** validates items based on `slot_class` and `slot_subclass` restrictions
 - Only compatible items can be placed in specific slot types
 - Maximum of 4 bags can be held at once (enforced in GlobalInventory setter)
 
@@ -58,8 +67,8 @@ config:
 classDiagram
     Node --|> GlobalInventory
     class GlobalInventory {
-        +Array~Inventory_Slot~ bags
-        +Array~Item_Template~ items
+        +Array~Inventory_Slot~ bag_slots
+        +Array~Inventory_Slot~ item_slots
         +signal bags_updated()
         +signal items_updated()
         +_ready() void
@@ -81,8 +90,9 @@ classDiagram
     Node --|> Inventory_Slot
     class Inventory_Slot {
         +Item_Template item
-        +ITEM_CLASS item_class
-        +ITEM_SUBCLASS item_subclass
+        +int slot_class
+        +int slot_subclass
+        +signal slot_changed(slot)
         +_init(i_c, i_s) void
     }
 
@@ -97,7 +107,17 @@ classDiagram
         +_on_items_updated() void
     }
 
-    GlobalInventory --o Inventory_Slot : contains_bags
+    Resource --|> Item
+    class Item {
+        +String display_name
+        +String description
+        +Texture2D icon
+        +int max_stack_size
+        +_on_use(player) bool
+    }
+
+    GlobalInventory --o Inventory_Slot : contains_bag_slots
+    GlobalInventory --o Inventory_Slot : contains_item_slots
     Inventory_Slot --o Item_Template : holds_item
     InventoryGUI ..> GlobalInventory : listens_to_signals
     InventoryGUI --> inventory_bag_gui : instantiates
@@ -111,7 +131,7 @@ classDiagram
     
     class ITEM_SUBCLASS {
         <<enumeration>>
-        CONSUMEABLE
+        CONSUMABLE
         POTION
         ELIXIR
         FLASK
@@ -151,10 +171,11 @@ InventoryGUI (Control)
 
 The system initializes as follows:
 
-1. **GlobalInventory** creates a bag slot for containers
-2. A backpack (Item_Template) is assigned to the bag slot with 8 container slots
-3. A health potion (Item_Template) is created and added to the items array
-4. **InventoryGUI** responds to updates by creating visual bag and slot elements
-5. Item icons are displayed in the appropriate TextureRect components
+1. **GlobalInventory** creates 4 bag slots for holding container items (bags)
+2. A backpack (Item_Template) is assigned to the first available bag slot with 8 container slots
+3. For each container slot in the bag, the system creates item slots in the `item_slots` array
+4. A health potion (Item_Template) is created and assigned to the first available item slot
+5. **InventoryGUI** responds to `bags_updated` signal by creating visual bag and slot elements
+6. **InventoryGUI** responds to `items_updated` signal by updating item icons in the TextureRect components
 
 This architecture supports future expansion to action bars, quest item containers, and other specialized inventory systems by reusing the same slot-based foundation. 

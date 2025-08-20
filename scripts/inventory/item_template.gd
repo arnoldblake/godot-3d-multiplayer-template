@@ -7,7 +7,7 @@ enum ITEM_CLASS {
 }
 
 enum ITEM_SUBCLASS {
-	CONSUMEABLE = 1,
+	CONSUMABLE = 1,
 	POTION = 2,
 	ELIXIR = 4,
 	FLASK = 8,

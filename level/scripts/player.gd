@@ -39,9 +39,17 @@ func _physics_process(delta):
 	if not is_multiplayer_authority(): return
 
 	var current_scene = get_tree().get_current_scene()
-	if current_scene and current_scene.has_method("is_chat_visible") and current_scene.is_chat_visible() and is_on_floor():
-		freeze()
-		return
+	if current_scene and is_on_floor():
+		# Freeze movement if chat or inventory is visible
+		var should_freeze = false
+		if current_scene.has_method("is_chat_visible") and current_scene.is_chat_visible():
+			should_freeze = true
+		elif current_scene.has_method("is_inventory_visible") and current_scene.is_inventory_visible():
+			should_freeze = true
+		
+		if should_freeze:
+			freeze()
+			return
 
 	if not is_on_floor():
 		velocity.y -= gravity * delta

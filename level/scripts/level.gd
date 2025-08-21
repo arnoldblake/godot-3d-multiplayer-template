@@ -13,12 +13,21 @@ extends Node3D
 @onready var chat: TextEdit = $MultiplayerChat/VBoxContainer/Chat
 @onready var multiplayer_chat: Control = $MultiplayerChat
 
+# inventory
+@onready var inventory_ui: InventoryUI = $InventoryUI
+
 var chat_visible = false
+var inventory_visible = false
 
 func _ready():
 	multiplayer_chat.hide()
 	menu.show()
 	multiplayer_chat.set_process_input(true)
+	
+	# Connect inventory signals
+	if inventory_ui:
+		inventory_ui.inventory_closed.connect(_on_inventory_closed)
+	
 	if not multiplayer.is_server():
 		return
 
@@ -83,6 +92,8 @@ func is_chat_visible() -> bool:
 func _input(event):
 	if event.is_action_pressed("toggle_chat"):
 		toggle_chat()
+	elif event.is_action_pressed("inventory"):
+		toggle_inventory()
 	elif event is InputEventKey and event.keycode == KEY_ENTER:
 		_on_send_pressed()
 
@@ -100,3 +111,20 @@ func _on_send_pressed() -> void:
 @rpc("any_peer", "call_local")
 func msg_rpc(nick, msg):
 	chat.text += str(nick, " : ", msg, "\n")
+
+# ---------- INVENTORY SYSTEM ----------
+func toggle_inventory():
+	if menu.visible:
+		return
+	
+	inventory_visible = !inventory_visible
+	if inventory_visible:
+		inventory_ui.open_inventory()
+	else:
+		inventory_ui.close_inventory()
+
+func is_inventory_visible() -> bool:
+	return inventory_visible
+
+func _on_inventory_closed():
+	inventory_visible = false

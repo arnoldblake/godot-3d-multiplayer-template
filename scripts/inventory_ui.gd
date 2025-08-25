@@ -7,7 +7,7 @@ class_name InventoryUI
 @onready var tooltip: Control = $ItemTooltip
 @onready var tooltip_label: RichTextLabel = $ItemTooltip/Panel/MarginContainer/TooltipText
 
-var player_inventory: PlayerInventory
+var current_player: Character
 var slot_ui_scene: PackedScene
 var slot_uis: Array[InventorySlotUI] = []
 
@@ -26,12 +26,8 @@ func _ready():
 	# Hide tooltip initially
 	tooltip.visible = false
 	
-	# Initialize empty inventory for testing
-	player_inventory = PlayerInventory.new()
+	# Will be initialized when a player opens their inventory
 	_create_slot_uis()
-	
-	# Add some test items
-	_add_test_items()
 
 func _create_slot_uis():
 	# Clear existing slots
@@ -50,13 +46,19 @@ func _create_slot_uis():
 		slot_ui.item_hovered.connect(_on_item_hovered)
 		slot_ui.item_unhovered.connect(_on_item_unhovered)
 		
-		# Set slot data
-		slot_ui.set_slot_data(player_inventory.get_slot(i), i)
+		# Set slot data - will be empty initially
+		slot_ui.set_slot_data(null, i)
 		
 		grid_container.add_child(slot_ui)
 		slot_uis.append(slot_ui)
 
 func update_inventory_display():
+	if not current_player or not current_player.get_inventory():
+		print("Debug: No current_player or inventory found")
+		return
+	
+	var player_inventory = current_player.get_inventory()
+	print("Debug: Updating inventory display with ", player_inventory.slots.size(), " slots")
 	for i in range(slot_uis.size()):
 		if i < PlayerInventory.INVENTORY_SIZE:
 			slot_uis[i].set_slot_data(player_inventory.get_slot(i), i)
@@ -74,6 +76,10 @@ func _on_slot_clicked(slot_index: int, button: int):
 			_handle_right_click(slot_index)
 
 func _handle_right_click(slot_index: int):
+	if not current_player or not current_player.get_inventory():
+		return
+	
+	var player_inventory = current_player.get_inventory()
 	var slot = player_inventory.get_slot(slot_index)
 	if slot and not slot.is_empty():
 		var item = ItemDatabase.get_item(slot.item_id)
@@ -132,47 +138,27 @@ func _get_rarity_string(rarity: Item.ItemRarity) -> String:
 func handle_item_drop(from_slot: int, to_slot: int, inventory_type: String):
 	print("Moving item from slot ", from_slot, " to slot ", to_slot)
 	
-	if inventory_type == "player":
-		if player_inventory.move_item(from_slot, to_slot):
-			update_inventory_display()
-			print("Item moved successfully")
-		else:
-			# Try swapping if move failed
-			if player_inventory.swap_items(from_slot, to_slot):
-				update_inventory_display()
-				print("Items swapped successfully")
-			else:
-				print("Move/swap failed")
+	if inventory_type == "player" and current_player:
+		# Send request to server for inventory operation
+		current_player.request_move_item.rpc_id(1, from_slot, to_slot)
+		# UI will be updated when server responds with sync_inventory_to_owner
 
 func _on_close_pressed():
 	inventory_closed.emit()
 	visible = false
 
-func open_inventory():
+func open_inventory(player: Character = null):
+	if player:
+		current_player = player
+		update_inventory_display()
 	visible = true
 
 func close_inventory():
 	visible = false
 
-# Test function to add some items for visual testing
-func _add_test_items():
-	var sword = ItemDatabase.get_item("iron_sword")
-	var potion = ItemDatabase.get_item("health_potion")
-	var armor = ItemDatabase.get_item("leather_armor")
-	var gem = ItemDatabase.get_item("magic_gem")
-	var pickaxe = ItemDatabase.get_item("iron_pickaxe")
-	
-	if sword:
-		player_inventory.add_item(sword, 1)
-	if potion:
-		player_inventory.add_item(potion, 5)
-	if armor:
-		player_inventory.add_item(armor, 1)
-	if gem:
-		player_inventory.add_item(gem, 2)
-	if pickaxe:
-		player_inventory.add_item(pickaxe, 1)
-	
+# Called by level scene to update inventory display when server syncs
+func refresh_display():
+	print("Debug: InventoryUI refresh_display called")
 	update_inventory_display()
 
 func _input(event):

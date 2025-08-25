@@ -114,6 +114,7 @@ func _get_drag_data(_position: Vector2):
 	var preview = Control.new()
 	var preview_icon = TextureRect.new()
 	preview_icon.texture = item.icon
+	preview_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	preview_icon.size = Vector2(32, 32)
 	preview.add_child(preview_icon)
 	
